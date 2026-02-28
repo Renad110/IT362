@@ -1,146 +1,188 @@
-# Data Science Project – Phase 2  
-## Logbook – Data Collection  
-**Project Topic:** Hajj Crowd Analysis and Weather Impact  
-**Date:** 28 February 2026  
+
+# Logbook – Phase 2: Data Collection and Initial Integration
+**Date:** 28 Feb 2026
 
 ---
 
-# 1. Introduction
-
-This logbook documents the data collection process for Phase 2 of the project, including dataset sources, download methods, and initial observations prior to processing and cleaning.
-
-The project aims to analyze Hajj crowd data and integrate it with weather data based on time and date to study possible relationships between weather conditions and crowd density patterns.
+## Task: documents the data collection process and the initial integration of the Hajj activity dataset with hourly weather data.  
+The objective is to analyze how weather conditions influence crowd behavior, movement patterns, and overall pilgrim experience during Hajj 2024.
 
 ---
 
-# 2. Dataset 1 – KSA Weather Dataset (2020–2025)
+## Dataset 1 – Hajj and Umrah Crowd Management Dataset (2024)
 
-- **Source:** Kaggle  
-- **Dataset Name:** KSA Weather Dataset 2020–2025  
-- **URL:** https://www.kaggle.com/datasets/ziadwael/ksa-weather-dataset-2020-2025  
-- **Date of Collection:** 28 Feb 2026  
-- **File Format:** CSV  
-- **Time Coverage:** 2020–2025  
-- **Geographic Scope:** Saudi Arabia (including Makkah if available)  
-- **Collection Method:** Direct manual download from Kaggle platform  
-- **Storage Location:** `/Raw_Data/weather_raw.csv`
+- Source: Kaggle  
+- URL: https://www.kaggle.com/datasets/yarayahyahassan/hajj-and-umrah-crowd-management-dataset-2024  
+- Date of Collection: 6 Feb 2026  
+- Collection Method: Direct manual download from Kaggle  
+- File Format: CSV  
 
-### Initial Observations:
+### Main Features:
 
-- Data appears to be daily weather observations.
-- Likely includes columns such as:
-  - Date
-  - Temperature
-  - Humidity
-  - Wind Speed
-  - Pressure
-- Date format is expected to be in `YYYY-MM-DD`.
-- Dataset spans multiple years (2020–2025), which is broader than the Hajj dataset.
-- Possible presence of missing values (Null entries).
-- Data granularity: Daily level.
+Timestamp  
+Location_Lat  
+Location_Long  
+Crowd_Density  
+Movement_Speed  
+Activity_Type  
+Weather_Conditions  
+Temperature  
+Sound_Level_dB  
+Fatigue_Level  
+Stress_Level  
+Queue_Time_minutes  
+Health_Condition  
+Age_Group  
+Nationality  
+Transport_Mode  
+Emergency_Event  
+Incident_Type  
+Crowd_Morale  
+Pilgrim_Experience  
+Month  
+Day  
+Hour  
+Is_Hajj_Season  
 
----
+### Challenges:
 
-# 3. Dataset 2 – Hajj and Umrah Crowd Management Dataset (2024)
-
-- **Source:** Kaggle  
-- **Dataset Name:** Hajj and Umrah Crowd Management Dataset 2024  
-- **URL:** https://www.kaggle.com/datasets/yarayahyahassan/hajj-and-umrah-crowd-management-dataset-2024  
-- **Date of Collection:** 28 Feb 2026  
-- **File Format:** CSV  
-- **Time Coverage:** 2024 (Hajj season)  
-- **Geographic Scope:** Hajj-related locations (e.g., Makkah, Mina, Arafat, etc., if specified)  
-- **Collection Method:** Direct manual download from Kaggle platform  
-- **Storage Location:** `/Raw_Data/hajj_raw.csv`
-
-### Initial Observations:
-
-- Dataset focuses on crowd management during Hajj 2024.
-- Likely contains:
-  - Date
-  - Time (if available)
-  - Location
-  - Crowd density / number of pilgrims
-- Data granularity may be:
-  - Daily
-  - Hourly
-  - Event-based
-- Limited to a single year (2024).
-- May require alignment with weather data based on date and time.
+- Dataset limited to Hajj 2024.
+- Requires alignment with external weather data.
+- Timestamp format needed compatibility with weather datetime.
 
 ---
 
-# 4. Data Storage Structure
+## Dataset 2 – KSA Weather Dataset (2020–2025)
 
-The following project structure was created:
+- Source: Kaggle  
+- URL: https://www.kaggle.com/datasets/ziadwael/ksa-weather-dataset-2020-2025  
+- Date of Collection: 24 Feb 2026  
+- Collection Method: Direct manual download from Kaggle  
+- File Format: CSV  
 
+## Main Features:
+
+Date  
+Time  
+Temperature  
+Humidity  
+Wind  
+Wind Speed  
+Wind Gust  
+Pressure  
+Precip.  
+Condition  
+
+## Challenges:
+
+- Covers multiple years (2020–2025).
+- Date and Time stored separately.
+- Required datetime transformation before merging.
+
+---
+
+## Data Integration Process
+
+To study the influence of weather on Hajj crowd behavior, the two datasets were merged based on time alignment.
+
+### Step 1: Create Unified Datetime Column (Weather Data)
+
+```python
+weather_df["weather_dt"] = pd.to_datetime(
+    weather_df["Date"].astype(str) + " " + weather_df["Time"].astype(str),
+    errors="coerce"
+)
 ```
-/Project_Name
-   /Raw_Data
-      weather_raw.csv
-      hajj_raw.csv
-   Logbook_Phase2_Data_Collection.md
+
+This step combines Date and Time into a single datetime column (weather_dt).
+
+---
+
+### Step 2: Time-Based Merge Using Nearest Timestamp
+
+```python
+merged = pd.merge_asof(
+    hajj_df.sort_values("Timestamp"),
+    weather_df.sort_values("weather_dt"),
+    left_on="Timestamp",
+    right_on="weather_dt",
+    direction="nearest"
+)
 ```
 
-All datasets were saved in their original format without any modification.
+merge_asof was used to match each Hajj record with the closest hourly weather observation.
 
 ---
 
-# 5. Planned Integration Strategy
+### Step 3: Save Integrated Dataset
 
-The datasets will be merged based on shared keys.
+```python
+merged.to_csv("merged_output.csv", index=False)
+```
 
-## Primary Merge Keys:
-
-- `Date`
-- `Time` (if available in both datasets)
-- Possibly `Location` (if weather dataset contains city-level data)
-
-## Merge Objective:
-
-To align weather conditions with Hajj crowd levels for the same time period to analyze potential relationships between:
-
-- Temperature and crowd density
-- Humidity and crowd flow
-- Wind speed and crowd management patterns
+The final merged dataset was saved for further processing and analysis.
 
 ---
 
-# 6. Identified Challenges (Before Cleaning)
+## Post-Merge Dataset Overview
 
-1. Time Coverage Mismatch:
-   - Weather dataset: 2020–2025
-   - Hajj dataset: 2024 only
+## Shape
 
-   → Only 2024 weather data will be used during integration.
+Rows: 1212  
+Columns: 48  
 
-2. Granularity Difference:
-   - Weather data: Daily
-   - Hajj data: Possibly hourly or event-based
-
-   → May require time aggregation or transformation.
-
-3. Date Format Differences:
-   - Possible different formats (e.g., YYYY-MM-DD vs DD/MM/YYYY)
-
-4. Missing Values:
-   - Weather dataset may contain null entries.
-
-5. Location Matching:
-   - Weather dataset may include multiple cities.
-   - Hajj dataset may include specific Hajj sites.
-   - Filtering for Makkah region may be required.
+The merge was successful and produced 1212 matched observations.
 
 ---
 
-# 7. Summary
+### Data Types Overview
 
-- Both datasets were successfully collected.
-- No modifications were made to the raw files.
-- Data saved in Raw_Data folder.
-- Initial review suggests integration is feasible using Date and Time keys.
-- Further processing and cleaning will be handled in the next phase.
+- Timestamp and weather_dt stored as datetime64.
+- Location coordinates stored as float64.
+- Behavioral metrics stored as numeric types.
+- Several weather-related features (Temperature_y, Humidity, Wind Speed, Wind Gust, Pressure, Precip.) are stored as object type and will require type conversion.
 
 ---
 
-**End of Data Collection Logbook – Phase 2**
+### Missing Values Analysis
+
+A missing value check was performed.
+
+Result:
+- No missing values detected.
+- All 1212 records are complete.
+
+---
+
+### Key Observations After Merge
+
+1. Duplicate Temperature Columns:
+   - Temperature_x (Hajj dataset)
+   - Temperature_y (Weather dataset)
+
+   These will need review during cleaning.
+
+2. Duplicate Date Columns:
+   - Date_x
+   - Date_y
+
+3. Weather variables currently stored as object type require conversion to numeric.
+
+4. Time Coverage:
+   - Data spans from 6 June 2024 to 18 July 2024.
+   - Matches Hajj 2024 season.
+
+5. Is_Hajj_Season column contains only value 1, confirming filtering to Hajj period.
+
+---
+
+## Summary
+
+- Both datasets were successfully collected from Kaggle.
+- Weather datetime column was created for alignment.
+- Time-based merging was performed using nearest timestamp logic.
+- The final dataset contains 1212 records and 48 columns.
+- No missing values were detected.
+- Dataset is ready for Data Cleaning and Exploratory Data Analysis (EDA).
+
+
