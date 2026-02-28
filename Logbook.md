@@ -1,13 +1,11 @@
 
-# Logbook – Phase 2: Data Collection and Initial Integration
+# Logbook – Phase 2: Data Processing, Cleaning, and Exploratory Data Analysis (EDA)
 **Date:** 28 Feb 2026
 
----
-
-## Task: documents the data collection process and the initial integration of the Hajj activity dataset with hourly weather data.  
+## Task:
+documents the data collection process and the initial integration of the Hajj activity dataset with hourly weather data.  
 The objective is to analyze how weather conditions influence crowd behavior, movement patterns, and overall pilgrim experience during Hajj 2024.
 
----
 
 ## Dataset 1 – Hajj and Umrah Crowd Management Dataset (2024)
 
@@ -50,7 +48,6 @@ Is_Hajj_Season
 - Requires alignment with external weather data.
 - Timestamp format needed compatibility with weather datetime.
 
----
 
 ## Dataset 2 – KSA Weather Dataset (2020–2025)
 
@@ -60,7 +57,7 @@ Is_Hajj_Season
 - Collection Method: Direct manual download from Kaggle  
 - File Format: CSV  
 
-## Main Features:
+### Main Features:
 
 Date  
 Time  
@@ -73,13 +70,12 @@ Pressure
 Precip.  
 Condition  
 
-## Challenges:
+### Challenges:
 
 - Covers multiple years (2020–2025).
 - Date and Time stored separately.
 - Required datetime transformation before merging.
 
----
 
 ## Data Integration Process
 
@@ -96,7 +92,6 @@ weather_df["weather_dt"] = pd.to_datetime(
 
 This step combines Date and Time into a single datetime column (weather_dt).
 
----
 
 ### Step 2: Time-Based Merge Using Nearest Timestamp
 
@@ -112,7 +107,6 @@ merged = pd.merge_asof(
 
 merge_asof was used to match each Hajj record with the closest hourly weather observation.
 
----
 
 ### Step 3: Save Integrated Dataset
 
@@ -122,18 +116,16 @@ merged.to_csv("merged_output.csv", index=False)
 
 The final merged dataset was saved for further processing and analysis.
 
----
 
 ## Post-Merge Dataset Overview
 
-## Shape
+### Shape
 
 Rows: 1212  
 Columns: 48  
 
 The merge was successful and produced 1212 matched observations.
 
----
 
 ### Data Types Overview
 
@@ -142,7 +134,6 @@ The merge was successful and produced 1212 matched observations.
 - Behavioral metrics stored as numeric types.
 - Several weather-related features (Temperature_y, Humidity, Wind Speed, Wind Gust, Pressure, Precip.) are stored as object type and will require type conversion.
 
----
 
 ### Missing Values Analysis
 
@@ -152,7 +143,6 @@ Result:
 - No missing values detected.
 - All 1212 records are complete.
 
----
 
 ### Key Observations After Merge
 
@@ -174,7 +164,6 @@ Result:
 
 5. Is_Hajj_Season column contains only value 1, confirming filtering to Hajj period.
 
----
 
 ## Summary
 
@@ -185,4 +174,5 @@ Result:
 - No missing values were detected.
 - Dataset is ready for Data Cleaning and Exploratory Data Analysis (EDA).
 
+---
 
