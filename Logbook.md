@@ -177,43 +177,56 @@ Result:
 ---
 
 ## Exploratory Data Analysis (EDA)
-## 1. Objective & Overview
-The goal of this session was to perform a comprehensive EDA on the primary dataset (1,212 records, 48 features) to understand the factors influencing the pilgrim experience, specifically focusing on movement, safety, and environmental conditions.
+## 1. Overview of Primary Data Analysis
+Data Source: Merged dataset (initially hajj_data.csv merged with external sources).
+Context: Real-time pilgrim activities, crowd metrics, and physiological responses during the Hajj season.
 
-## 2. Tools & Libraries Used
-The analysis was performed using Python within a Jupyter Notebook environment. Key libraries included:
+Analysis Performed:
 
-Pandas: For data loading, cleaning, and manipulation.
+Descriptive Statistical Summary: Generated mean, standard deviation, and quartiles for 17 numerical features including Movement_Speed, Sound_Level_dB, Queue_Time_minutes, and Satisfaction_Rating.
 
-Matplotlib & Seaborn: For generating statistical visualizations and heatmaps.
+Distribution Analysis: Histograms with Kernel Density Estimation (KDE) were plotted for all numerical features to identify skewness and central tendencies.
 
-NumPy: For numerical operations and correlation calculations.
+Categorical Frequency Analysis: Statistical summaries for categorical columns like Activity_Type, Fatigue_Level, and Nationality were conducted to identify the most frequent occurrences (e.g., 'Sa’i' as the top activity, 'Youth' as the dominant age group).
 
-## 3. Types of Analysis Performed
+Interesting Findings & Observations:
 
-Data Profiling: Inspected data types and confirmed there were zero missing values, ensuring the high quality of the primary data.
+Crowd Density: After filtering for the Hajj season, the Crowd_Density was found to be consistently High across the entire subset, leading to its removal as a constant feature for predictive modeling.
 
-Univariate Analysis: Analyzed the distribution of individual variables like Movement_Speed, Temperature, and Queue_Time_minutes using Histograms and Kernel Density Estimate (KDE) plots.
+Pilgrim Sentiment: The Satisfaction_Rating and Perceived_Safety_Rating showed a mean of approximately 2.9 out of 5, indicating moderate satisfaction levels with significant variance (Std Dev ~1.4).
 
-Bivariate & Multivariate Analysis: Explored relationships between multiple variables to identify how environmental factors affect pilgrim behavior.
+Physiological Stress: Both Fatigue_Level and Stress_Level most frequently appeared in the High and Medium categories, respectively, correlating with the intense nature of the pilgrimage rituals.
 
-Correlation Analysis: Generated a correlation matrix to quantify the strength of relationships between features.
+## 2. Overview of Secondary Data Analysis
+Data Source: Weather data (initially weather_data.csv integrated into the main frame).
+Context: Atmospheric conditions and their impact on the pilgrim environment.
 
-## 4. Key Findings & Interpretations
+Analysis Performed:
 
-Safety as a Driver: A significant positive correlation (~0.7) was found between Perceived_Safety_Rating and Satisfaction_Rating. This indicates that safety is the primary contributor to a positive pilgrim experience.
+Feature Unification: Comparative analysis between redundant temperature fields (Temperature_x and Temperature_y) was performed to select the most reliable source, leading to the unification of weather metrics.
 
-Operational Bottlenecks: Strong correlations exist between Queue_Time_minutes, Waiting_Time_for_Transport, and Security_Checkpoint_Wait_Time. This suggests that delays in one area often cascade into others.
+Statistical Summary of Environment: Analysis of Temperature, Dew Point, Humidity, and Wind Speed to understand the environmental constraints.
 
-Environmental Impact: A moderate negative correlation (~ -0.37) was observed between Movement_Speed and Sound_Level_dB. Higher noise levels are associated with slower movement, likely due to increased crowd density or disorientation.
+Interesting Findings & Observations:
 
-## 5. Anomalies & Observations
+Heat Extremes: The maximum temperature recorded was 45°C, with an average of 37.5°C, highlighting the extreme heat stress pilgrims face.
 
-Data Consistency: The Is_Hajj_Season column contained a constant value (1), confirming the data is focused exclusively on the peak pilgrimage period.
+Low Humidity: The most frequent humidity level was as low as 5%, confirming an arid environment.
 
-AR Engagement: The analysis showed a high frequency of 'Started' status in AR System Interactions, indicating successful initial engagement with digital navigation tools.
+Weather Consistency: The most frequent condition was "Fair" (occurring 1,177 times out of 1,212 entries), which suggests that while temperatures are high, visibility and general weather patterns remain stable.
 
-Temperature Variance: Observed differences between internal and external temperatures (Temperature_x and Temperature_y), which warrants further investigation into how indoor cooling affects movement patterns.
+## 3. Tools and Libraries Used
+Pandas: For data manipulation, loading (pd.read_csv), and statistical summaries (df.describe()).
 
-## 6. Conclusion & Next Steps
-The EDA confirms that managing queue times and enhancing the sense of safety are critical for improving satisfaction. The next phase will involve deeper modeling to predict satisfaction levels based on these primary environmental and operational inputs
+Matplotlib.pyplot: For creating the structural framework of the distribution plots.
+
+Seaborn: Used for advanced visualization, specifically sns.histplot with kde=True to visualize data distribution curves.
+
+Scikit-Learn (StandardScaler): Utilized for the Z-score normalization of features like Fatigue_Level and Stress_Level.
+
+## 4. Anomalies & Challenges Overcome
+Redundancy Anomaly: It was observed that several columns (e.g., Date_x, Date_y, weather_dt) contained identical or overlapping temporal information. Decision: These were dropped to reduce dimensionality from 48 to 33 columns, ensuring the model focuses only on unique identifiers.
+
+Constant Feature Discovery: Features like Is_Hajj_Season and Precip. were found to have zero variance (all values identical). Decision: These were excluded from further EDA as they provided no discriminatory power for analysis.
+
+Categorical Encoding: To perform correlation analysis during EDA, categorical tiers (Low, Medium, High) were mapped to numeric values (1, 2, 3) to allow for mathematical processing.ing the sense of safety are critical for improving satisfaction. The next phase will involve deeper modeling to predict satisfaction levels based on these primary environmental and operational inputs
