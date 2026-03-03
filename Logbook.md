@@ -230,3 +230,220 @@ Redundancy Anomaly: It was observed that several columns (e.g., Date_x, Date_y, 
 Constant Feature Discovery: Features like Is_Hajj_Season and Precip. were found to have zero variance (all values identical). Decision: These were excluded from further EDA as they provided no discriminatory power for analysis.
 
 Categorical Encoding: To perform correlation analysis during EDA, categorical tiers (Low, Medium, High) were mapped to numeric values (1, 2, 3) to allow for mathematical processing.ing the sense of safety are critical for improving satisfaction. The next phase will involve deeper modeling to predict satisfaction levels based on these primary environmental and operational inputs
+
+Date: 1/3/2026 & 2/3/2026 Data Preprocessing & Feature Engineering
+
+
+## Task:
+
+Documents the data preprocessing, cleaning, feature transformation, and standardization steps performed on the merged Hajj–Weather dataset.
+
+The objective is to prepare a structured, fully numeric, and model-ready dataset suitable for advanced analysis and predictive modeling.
+
+---
+
+## 1. Data Cleaning & Structural Refinement
+
+After completing Phase 1 (Data Integration & Initial EDA), the dataset required structural optimization to improve analytical reliability.
+
+### Actions Performed:
+
+### 1.1 Duplicate Removal
+
+```python
+merged.drop_duplicates(inplace=True)
+```
+
+* Checked for duplicated rows.
+* No critical duplication detected.
+* Ensured data integrity before transformation.
+
+---
+
+### 1.2 Redundant Column Removal
+
+The following columns were removed due to redundancy or lack of analytical value:
+
+* Date_x
+* Date_y
+* Time
+* weather_dt
+* Month
+* Day
+* DayOfWeek
+* Weather_Conditions
+* Temperature_x
+
+### Reason:
+
+* Date-related columns duplicated timestamp information.
+* Weather_Conditions was textual and replaced with structured numeric weather metrics.
+* Temperature_x duplicated Temperature_y.
+* Some temporal breakdown columns could be regenerated later if needed.
+
+This reduced dataset dimensionality and improved model efficiency.
+
+---
+
+## 2. Data Type Conversion & Unit Cleaning
+
+Several weather-related features were stored as object type due to measurement units embedded within values.
+
+### 2.1 Dew Point Cleaning
+
+```python
+merged["Dew Point"] = merged["Dew Point"].str.replace("°F", "").astype(float)
+```
+
+* Removed unit symbol.
+* Converted to float.
+
+---
+
+### 2.2 Wind Speed Cleaning
+
+```python
+merged["Wind Speed"] = merged["Wind Speed"].str.replace("mph", "")
+merged["Wind Speed"] = merged["Wind Speed"].replace("CALM", 0)
+merged["Wind Speed"] = pd.to_numeric(merged["Wind Speed"], errors="coerce")
+```
+
+* Removed text unit.
+* Converted "CALM" to 0.
+* Ensured numeric compatibility.
+
+---
+
+### 2.3 Pressure Cleaning
+
+```python
+merged["Pressure"] = merged["Pressure"].str.replace("in", "")
+merged["Pressure"] = pd.to_numeric(merged["Pressure"], errors="coerce")
+```
+
+---
+
+### 2.4 Humidity Cleaning
+
+```python
+merged["Humidity"] = merged["Humidity"].str.replace("%", "")
+merged["Humidity"] = pd.to_numeric(merged["Humidity"], errors="coerce")
+```
+
+---
+
+### Result:
+
+All environmental variables successfully converted to numeric format.
+
+---
+
+## 3. Hajj Season Validation
+
+The dataset was verified to contain only Hajj-season records:
+
+```python
+merged["Is_Hajj_Season"].unique()
+```
+
+Result:
+
+* Only value present: 1
+* Confirms correct seasonal filtering.
+
+Since this feature had zero variance, it was later excluded from modeling.
+
+---
+
+## 4. Categorical Encoding
+
+To enable statistical modeling and correlation analysis, ordinal categorical variables were encoded numerically.
+
+### Example:
+
+```python
+mapping = {"Low": 1, "Medium": 2, "High": 3}
+merged["Fatigue_Level"] = merged["Fatigue_Level"].map(mapping)
+merged["Stress_Level"] = merged["Stress_Level"].map(mapping)
+```
+
+### Purpose:
+
+* Preserve ordinal relationship.
+* Enable mathematical operations.
+* Prepare for feature scaling.
+
+---
+
+## 5. Feature Scaling (Standardization)
+
+To ensure uniform feature magnitude and prevent dominance of large-scale variables, **Z-score normalization** was applied.
+
+```python
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+merged[numerical_cols] = scaler.fit_transform(merged[numerical_cols])
+```
+
+### Features Standardized:
+
+* Movement_Speed
+* Queue_Time_minutes
+* Waiting_Time_for_Transport
+* Security_Checkpoint_Wait_Time
+* Distance_Between_People_m
+* Sound_Level_dB
+* Satisfaction_Rating
+* Perceived_Safety_Rating
+* Weather-related numeric variables
+
+### Outcome:
+
+* Mean ≈ 0
+* Standard Deviation ≈ 1
+* Improved comparability across features
+
+---
+
+## 6. Dimensionality Optimization
+
+After cleaning and removal of redundant variables:
+
+* Columns reduced from 48 → 33
+* All remaining features are numeric and structured
+* Dataset is fully modeling-ready
+
+---
+
+## 7. Data Quality Verification
+
+Post-cleaning validation checks were performed:
+
+* No missing values detected
+* No duplicated rows
+* No object-type weather metrics remaining
+* All categorical tiers successfully encoded
+
+---
+
+## Summary
+
+Phase Two successfully transformed the merged Hajj–Weather dataset into a clean, structured, and standardized analytical dataset.
+
+Key Achievements:
+
+* Removed redundant temporal columns
+* Cleaned unit-based weather variables
+* Encoded ordinal categories
+* Applied Z-score normalization
+* Reduced dimensionality
+* Ensured zero missing values
+
+The dataset is now fully prepared for advanced modeling, predictive analytics, and correlation analysis in the next phase.
+
+---
+
+.
+
+
