@@ -76,6 +76,43 @@ Condition
 - Date and Time stored separately.
 - Required datetime transformation before merging.
 
+## Dataset 3 (Secondary Data) – weather_crowd_dataset
+
+- Source: Kaggle  
+- URL: https://www.kaggle.com/datasets/adnankust/weather-crowd-dataset  
+- Date of Collection: 28 Feb 2026  
+- Collection Method: Direct manual download from Kaggle  
+- File Format: CSV  
+
+### Main Features:
+  
+Temperature  
+Humidity    
+Wind Speed  
+Wind Direction  
+Pressure  
+CloudCover
+Visibility 
+DewPoint
+UVIndex
+Precipitation
+Month
+DayOfWeek
+IsWeekend
+Season
+PreviousRain
+EventType
+CrowdDensity
+ShelterAvailability
+HeatIslandEffect
+CrowdHumidityImpact
+EventDuration
+EmergencyFacilities
+ReligiousSeasonFactor
+Rained
+SafetyRisk
+
+This dataset is considered secondary data. It will be used to perform Exploratory Data Analysis (EDA) separately and compare patterns with the primary merged Hajj-weather dataset.
 
 ## Data Integration Process
 
